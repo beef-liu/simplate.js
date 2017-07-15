@@ -1,0 +1,122 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>test 1</title>
+
+    <!-- <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script> -->
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="../src/simplate.js"></script>
+
+    <script>
+        (function () {
+            var _template1;
+
+            $(document).ready(function() {
+                $('#btn_load_data1').bind('click', loadData1);
+
+                _template1 = $simplate.build($('#data1'));
+            });
+
+            function loadData1() {
+                var data1 = fetchData1();
+
+                _template1.render(
+                    {
+                        "data": data1
+                    }
+                );
+            }
+
+            function fetchData1() {
+                var data1 = {
+                    persons: [],
+                };
+
+                var size = Math.random() * 10;
+                for (var i = 0; i < size; i++) {
+                    var randNum = Math.round(Math.random() * 100, 2) / 100;
+                    var p = {
+                        id: "p_" + i + "_" + randNum,
+                        name: "name_" + i + "_" + randNum,
+                        children: [
+                            {name: "child_0" + "_" + randNum},
+                            {name: "child_1" + "_" + randNum},
+                            {name: "child_2" + "_" + randNum},
+                        ]
+                    };
+
+                    data1.persons.push(p);
+                }
+
+                return data1;
+            }
+        })();
+
+
+        /*
+        function testReplace(str) {
+            str.replace(/\{\{([\s\S]+?)\}\}/g, function (caught, content) {
+                console.log("caught:" + caught + " content:" + content);
+            });
+        }
+        */
+        
+    </script>
+
+</head>
+<body>
+
+    <div>
+        <div>
+            <input type="button" id="btn_load_data1"  value="load data1">
+        </div>
+        <div>
+            <label>Data1</label>
+        </div>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <td>NO.</td>
+                        <td>ID</td>
+                        <td>name</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody id="data1">
+                    <template s>
+                        data.persons.forEach(function(p, i) {
+                            //console.log("person[" + i + "]: " + p.id);
+                    </template>
+                    <tr>
+                        <td>{{i + 1}}</td>
+                        <td>{{p.id}}</td>
+                        <td>{{p.name}}</td>
+                        <td>
+                            <!-- <div>&lt;template s&gt;</div> -->
+                            <template s>
+                                for(var k = 0; k < p.children.length; k++) {
+                                    var child = p.children[k];
+                            </template >
+                                <label>child[{{k}}]: </label>
+                                <span>{{child.name}}</span>
+                                <BR>
+                            <template s>
+                                }
+                            </template>
+                        </td>
+                    </tr>
+                    <template s>
+                        });
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<div id="data2">
+
+</div>
+
+</body>
+</html>
