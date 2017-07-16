@@ -3,9 +3,9 @@
     <meta charset="UTF-8">
     <title>test 1</title>
 
-    <!-- <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script> -->
-    <script src="jquery-3.2.1.min.js"></script>
-    <script src="../src/simplate.js"></script>
+     <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>  
+     <!-- <script src="jquery-3.2.1.min.js"></script>  -->
+     <script src="../src/simplate.js"></script>
 
     <script>
         (function () {
@@ -13,8 +13,10 @@
 
             $(document).ready(function() {
                 $('#btn_load_data1').bind('click', loadData1);
+                $('#btn_load_data1_append').bind('click', loadData1AppendOnly);
 
                 _template1 = $simplate.build($('#data1'));
+                _template1.render({});
             });
 
             function loadData1() {
@@ -23,6 +25,19 @@
                 _template1.render(
                     {
                         "data": data1
+                    }
+                );
+            }
+
+            function loadData1AppendOnly() {
+                var data1 = fetchData1();
+
+                _template1.render(
+                    {
+                        "data": data1
+                    },
+                    {
+                        append: true
                     }
                 );
             }
@@ -69,6 +84,7 @@
     <div>
         <div>
             <input type="button" id="btn_load_data1"  value="load data1">
+            <input type="button" id="btn_load_data1_append"  value="load data1(only append)">
         </div>
         <div>
             <label>Data1</label>
@@ -83,7 +99,7 @@
                         <td></td>
                     </tr>
                 </thead>
-                <tbody id="data1">
+                <tbody id="data1" s-append>
                     <template s>
                         data.persons.forEach(function(p, i) {
                             //console.log("person[" + i + "]: " + p.id);

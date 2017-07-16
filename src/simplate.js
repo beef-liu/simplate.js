@@ -7,6 +7,8 @@
         _namespace = window[NAME_NAMESPACE];
     }
 
+    var ATTR_append = "append";
+    
     var _idSeq  = 0;
     ////////////////  ////////////////
     
@@ -20,19 +22,40 @@
 
         prepare();
 
-        this.render = function (scope) {
-            renderTemplate(scope);
+        this.render = function (scope, options) {
+            renderTemplate(scope, options);
         };
+
+        function renderTemplate(scope, options) {
+            var append = (options && options.append) ? true : false;
+
+            try {
+                if(!append) {
+                    $(_rootNode).empty();
+                }
+
+                //generate new html
+                var html = callCompiledFunc(scope, _compiledFunc);
+
+                if(append) {
+                    //append
+                    compareAndAppend(_rootNode, $(html));
+                } else {
+                    $(_rootNode).html(html);
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        }
 
         function prepare () {
             //_rootId = checkSID(_rootNode);
-            _compiledFunc = compile(_rootNode);
-        }
 
-        function renderTemplate(scope) {
-            $(_rootNode).empty();
-            var html = callCompiledFunc(scope, _compiledFunc);
-            $(_rootNode).html(html);
+            //mark attribute of s-*
+            markIDForAttr(_rootNode, ATTR_append);
+
+            //compile
+            _compiledFunc = compile(_rootNode);
         }
 
         function compile(rootNode) {
@@ -103,30 +126,6 @@
             }
         }
 
-        /*
-        function genCode_old(codeBlock, node) {
-            var nodes = $(rootNode).children();
-            nodes.each(function(i, tmplNode) {
-                if(tmplNode.tagName.toLowerCase() == "template") {
-                    //template
-                    code += tmplNode.innerHTML + "\n";
-                } else {
-                    //other nodes need be output as contents
-                    code +=  varHtml + ' += "' + encodeStringVar(tmplNode.outerHTML) + '"'
-                            + '.replace(/\\{\\{([\\s\\S]+?)\\}\\}/g, function (caught, content) {' + '\n'
-                            + '  console.log("content:" + content);' + '\n'
-                            //+ '  var val = (new Function("with (this) {return " + content + "}")).call(this);' + '\n'
-                            //+ '  var val = (new Function("{return " + content + "}")).call(this);' + '\n'
-                            + ' var val = eval(content);' + '\n'
-                            + '  console.log("val:" + val);' + '\n'
-                            + '  return val;' + '\n'
-                            + '});' + '\n'
-                            ;
-                }
-            });
-        }
-        */
-
         function compileCode( code) {
             return (new Function("with (this) {\n" + code + "\n}"));
         }
@@ -135,6 +134,37 @@
             return func.call(scope);
         }
 
+        function markIDForAttr(rootNode, attr) {
+            var attrTarget = wrapWithNamespace(attr);
+            var attrID = wrapWithNamespace("id");
+
+            if($(rootNode).attr(attrTarget) != null) {
+                $(rootNode).attr(attrID, newId);
+            }
+
+            $(rootNode).find('[' + attrTarget + ']').each(function(i, e) {
+                $(e).attr(attrID, newId);
+            });
+        }
+
+        function compareAndAppend(rootNode, newNodes) {
+            var attrAppend = wrapWithNamespace(ATTR_append);
+            var attrID = wrapWithNamespace("id");
+
+            $(rootNode).find('[' + attrAppend + ']').each(function(i, e) {
+                var id = $(e).attr(attrID);
+
+                var newListRoot = $(newNodes).find('[' + attrID + '="' + id + '"' + ']');
+                if(newListRoot.length > 0) {
+                    $(e).append($(newListRoot).children());
+                }
+            });
+
+            if($(rootNode).attr(attrAppend) != null) {
+                $(rootNode).append(newNodes);
+                return;
+            }
+        }
         /*
         function checkSID(node) {
             var attrName = wrapWithNamespace("id");
@@ -195,7 +225,6 @@
             }
         });
     }
-    
 
     //expose
     window.$simplate = {
