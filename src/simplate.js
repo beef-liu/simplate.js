@@ -1,21 +1,21 @@
-(function () {
+(function (window) {
     //////////////// Global variables ////////////////
     var _namespace = "s";
-    
+
     var NAME_NAMESPACE = "simplate.namespace";
-    if(window[NAME_NAMESPACE]) {
+    if (window[NAME_NAMESPACE]) {
         _namespace = window[NAME_NAMESPACE];
     }
 
     var ATTR_append = "append";
-    
-    var _idSeq  = 0;
-    ////////////////  ////////////////
-    
-    //avoid duplicated
-    if(window.$simplate) return;
 
-    function SimpleTemplate (rootNode) {
+    var _idSeq = 0;
+    ////////////////  ////////////////
+
+    //avoid duplicated
+    if (window.$simplate) return;
+
+    function SimpleTemplate(rootNode) {
         var _rootNode = rootNode;
         //var _rootId;
         var _compiledFunc;
@@ -30,14 +30,14 @@
             var append = (options && options.append) ? true : false;
 
             try {
-                if(!append) {
+                if (!append) {
                     $(_rootNode).empty();
                 }
 
                 //generate new html
                 var html = callCompiledFunc(scope, _compiledFunc);
 
-                if(append) {
+                if (append) {
                     //append
                     compareAndAppend(_rootNode, $(html));
                 } else {
@@ -48,7 +48,7 @@
             }
         }
 
-        function prepare () {
+        function prepare() {
             //_rootId = checkSID(_rootNode);
 
             //mark attribute of s-*
@@ -65,7 +65,7 @@
             };
 
             codeBlock.code += "var " + codeBlock.retVarName + " = ''; \n";
-            
+
             genCode(codeBlock, $(rootNode).html());
 
             codeBlock.code += "  return " + codeBlock.retVarName + ";" + '\n';
@@ -77,24 +77,24 @@
 
         function genCode(codeBlock, html) {
             searchTemplate(html, function (isTemplate, text) {
-               if(isTemplate) {
-                   //template
-                   var tmplCode = decodeXmlContent(text);
-                   codeBlock.code += tmplCode + '\n';
-               } else {
-                   //{{xxx}} need be replaced
-                   codeBlock.code += codeBlock.retVarName 
-                            + ' += "' + encodeStringVar(text) + '"' 
-                            + '.replace(/\\{\\{([\\s\\S]+?)\\}\\}/g, function (caught, content) {' + '\n'
-                            //+ '  console.log("content:" + content);' + '\n'
-                            //+ '  var val = (new Function("with (this) {return " + content + "}")).call(this);' + '\n'
-                            //+ '  var val = (new Function("{return " + content + "}")).call(this);' + '\n'
-                            + ' var val = eval(content);' + '\n'
-                            //+ '  console.log("val:" + val);' + '\n'
-                            + '  return val;' + '\n'
-                            + '});' + '\n'
-                            ;
-               }
+                if (isTemplate) {
+                    //template
+                    var tmplCode = decodeXmlContent(text);
+                    codeBlock.code += tmplCode + '\n';
+                } else {
+                    //{{xxx}} need be replaced
+                    codeBlock.code += codeBlock.retVarName
+                        + ' += "' + encodeStringVar(text) + '"'
+                        + '.replace(/\\{\\{([\\s\\S]+?)\\}\\}/g, function (caught, content) {' + '\n'
+                        //+ '  console.log("content:" + content);' + '\n'
+                        //+ '  var val = (new Function("with (this) {return " + content + "}")).call(this);' + '\n'
+                        //+ '  var val = (new Function("{return " + content + "}")).call(this);' + '\n'
+                        + ' var val = eval(content);' + '\n'
+                        //+ '  console.log("val:" + val);' + '\n'
+                        + '  return val;' + '\n'
+                        + '});' + '\n'
+                        ;
+                }
             });
         }
 
@@ -102,31 +102,31 @@
             var patternOfTmplBegin = '<template ' + _namespace + '="">';
             var patternOfTmplEnd = '</template>';
 
-            var begin  = 0;
-            while(1) {
+            var begin = 0;
+            while (1) {
                 var tmplBegin = html.indexOf(patternOfTmplBegin, begin);
-                if(tmplBegin < 0) {
+                if (tmplBegin < 0) {
                     break;
                 }
 
                 var tmplEnd = html.indexOf(patternOfTmplEnd, tmplBegin + 1);
-                if(tmplEnd < 0) {
+                if (tmplEnd < 0) {
                     break;
                 }
 
                 callback(false, html.substring(begin, tmplBegin));
-                
+
                 callback(true, html.substring(tmplBegin + patternOfTmplBegin.length, tmplEnd));
                 tmplEnd += patternOfTmplEnd.length;
 
                 begin = tmplEnd;
             }
-            if(begin < html.length) {
+            if (begin < html.length) {
                 callback(false, html.substring(begin));
             }
         }
 
-        function compileCode( code) {
+        function compileCode(code) {
             return (new Function("with (this) {\n" + code + "\n}"));
         }
 
@@ -138,11 +138,11 @@
             var attrTarget = wrapWithNamespace(attr);
             var attrID = wrapWithNamespace("id");
 
-            if($(rootNode).attr(attrTarget) != null) {
+            if ($(rootNode).attr(attrTarget) != null) {
                 $(rootNode).attr(attrID, newId);
             }
 
-            $(rootNode).find('[' + attrTarget + ']').each(function(i, e) {
+            $(rootNode).find('[' + attrTarget + ']').each(function (i, e) {
                 $(e).attr(attrID, newId);
             });
         }
@@ -151,16 +151,16 @@
             var attrAppend = wrapWithNamespace(ATTR_append);
             var attrID = wrapWithNamespace("id");
 
-            $(rootNode).find('[' + attrAppend + ']').each(function(i, e) {
+            $(rootNode).find('[' + attrAppend + ']').each(function (i, e) {
                 var id = $(e).attr(attrID);
 
                 var newListRoot = $(newNodes).find('[' + attrID + '="' + id + '"' + ']');
-                if(newListRoot.length > 0) {
+                if (newListRoot.length > 0) {
                     $(e).append($(newListRoot).children());
                 }
             });
 
-            if($(rootNode).attr(attrAppend) != null) {
+            if ($(rootNode).attr(attrAppend) != null) {
                 $(rootNode).append(newNodes);
                 return;
             }
@@ -179,8 +179,8 @@
         */
     }
 
-    function newId () {
-        return "__simplate_" + (new Date()).getTime() + "_" + (++ _idSeq);
+    function newId() {
+        return "__simplate_" + (new Date()).getTime() + "_" + (++_idSeq);
     }
 
     function wrapWithNamespace(name) {
@@ -188,12 +188,12 @@
     }
 
     function domClearChildren(node) {
-        
+
     }
 
     function decodeXmlContent(str) {
-        return str.replace(/\&lt;|\&gt;|\&amp;|\&apos;|\&quot;/g, function(caught) {
-            if(caught == '&lt;') {
+        return str.replace(/\&lt;|\&gt;|\&amp;|\&apos;|\&quot;/g, function (caught) {
+            if (caught == '&lt;') {
                 return '<';
             } else if (caught == "&gt;") {
                 return ">";
@@ -208,11 +208,11 @@
             }
         });
     }
-    
+
     function encodeStringVar(str) {
-        return str.replace(/\"|\r|\n/g, function(caught) {
+        return str.replace(/\"|\r|\n/g, function (caught) {
             //console.log("caught:" + caught + " content:" + content);
-            if(caught == '"') {
+            if (caught == '"') {
                 return '\\"';
             } else if (caught == "\r") {
                 return "\\r";
@@ -233,4 +233,4 @@
         }
     };
 
-})();
+})(window);

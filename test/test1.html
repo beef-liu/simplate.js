@@ -1,23 +1,31 @@
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>test 1</title>
 
-     <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>  
-     <!-- <script src="jquery-3.2.1.min.js"></script>  -->
-     <script src="../src/simplate.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script> 
+    <!-- <script src="jquery-3.2.1.min.js"></script>   -->
+    <script src="../src/simplate.js"></script>
+    <script src="../src/domscan.js"></script>
 
     <script>
         (function () {
             var _template1;
 
-            $(document).ready(function() {
+            $(document).ready(function () {
                 $('#btn_load_data1').bind('click', loadData1);
                 $('#btn_load_data1_append').bind('click', loadData1AppendOnly);
+                $('#btn_scan_data1').bind('click', scanData1);
 
                 _template1 = $simplate.build($('#data1'));
                 _template1.render({});
             });
+
+            function scanData1() {
+                var obj = $domscan.scan($('[data="data1"]'), "data");
+                alert(JSON.stringify(obj));
+            }
 
             function loadData1() {
                 var data1 = fetchData1();
@@ -54,9 +62,9 @@
                         id: "p_" + i + "_" + randNum,
                         name: "name_" + i + "_" + randNum,
                         children: [
-                            {name: "child_0" + "_" + randNum},
-                            {name: "child_1" + "_" + randNum},
-                            {name: "child_2" + "_" + randNum},
+                            { name: "child_0" + "_" + randNum },
+                            { name: "child_1" + "_" + randNum },
+                            { name: "child_2" + "_" + randNum },
                         ]
                     };
 
@@ -75,21 +83,23 @@
             });
         }
         */
-        
     </script>
 
 </head>
+
 <body>
 
     <div>
         <div>
-            <input type="button" id="btn_load_data1"  value="load data1">
-            <input type="button" id="btn_load_data1_append"  value="load data1(only append)">
+            <input type="button" id="btn_load_data1" value="load data1">
+            <input type="button" id="btn_load_data1_append" value="load data1(only append)">
+            <input type="button" id="btn_scan_data1" value="scan data1 as object">
         </div>
         <div>
             <label>Data1</label>
         </div>
-        <div>
+        <div data="data1">
+            <span data="date">2017-07-17</span>
             <table>
                 <thead>
                     <tr>
@@ -99,27 +109,25 @@
                         <td></td>
                     </tr>
                 </thead>
-                <tbody id="data1" s-append>
+                <tbody id="data1" data="persons[]" s-append>
                     <template s>
                         data.persons.forEach(function(p, i) {
-                            //console.log("person[" + i + "]: " + p.id);
                     </template>
-                    <tr>
+                    <tr data="Person">
                         <td>{{i + 1}}</td>
-                        <td>{{p.id}}</td>
-                        <td>{{p.name}}</td>
-                        <td>
+                        <td data="id">{{p.id}}</td>
+                        <td data="name">{{p.name}}</td>
+                        <td data="children[]">
                             <!-- <div>&lt;template s&gt;</div> -->
                             <template s>
-                                for(var k = 0; k < p.children.length; k++) {
-                                    var child = p.children[k];
-                            </template >
-                                <label>child[{{k}}]: </label>
-                                <span>{{child.name}}</span>
-                                <BR>
-                            <template s>
-                                }
-                            </template>
+                                for(var k = 0; k < p.children.length; k++) { var child=p .children[k]; </template>
+                                    <div data="Child">
+                                        <label>child[{{k}}]: </label>
+                                        <span data="name">{{child.name}}</span>
+                                    </div>
+                                    <template s>
+                                        }
+                                    </template>
                         </td>
                     </tr>
                     <template s>
@@ -130,9 +138,10 @@
         </div>
     </div>
 
-<div id="data2">
+    <div id="data2">
 
-</div>
+    </div>
 
 </body>
+
 </html>
