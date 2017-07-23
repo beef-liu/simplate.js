@@ -1,12 +1,5 @@
 (function (window) {
     //////////////// Global variables ////////////////
-    var _namespace = "s";
-
-    var NAME_NAMESPACE = "simplate.namespace";
-    if (window[NAME_NAMESPACE]) {
-        _namespace = window[NAME_NAMESPACE];
-    }
-
     var ATTR_append = "append";
 
     var _idSeq = 0;
@@ -15,8 +8,12 @@
     //avoid duplicated
     if (window.$simplate) return;
 
-    function SimpleTemplate(rootNode) {
+    function SimpleTemplate(rootNode, options) {
         var _rootNode = rootNode;
+
+        var _namespace = (options && options.namespace) ? options.namespace : "s";
+        
+
         //var _rootId;
         var _compiledFunc;
 
@@ -165,6 +162,12 @@
                 return;
             }
         }
+
+
+        function wrapWithNamespace(name) {
+            return _namespace + "-" + name;
+        }
+        
         /*
         function checkSID(node) {
             var attrName = wrapWithNamespace("id");
@@ -181,14 +184,6 @@
 
     function newId() {
         return "__simplate_" + (new Date()).getTime() + "_" + (++_idSeq);
-    }
-
-    function wrapWithNamespace(name) {
-        return _namespace + "-" + name;
-    }
-
-    function domClearChildren(node) {
-
     }
 
     function decodeXmlContent(str) {
